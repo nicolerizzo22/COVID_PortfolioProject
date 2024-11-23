@@ -1,7 +1,4 @@
--- This project 
-
-
-
+-- Analyzing some COVID data
 
 SELECT *
 FROM PortfolioProject.dbo.CovidVaccinations_csv
@@ -11,7 +8,7 @@ SELECT *
 FROM PortfolioProject.dbo.CovidDeaths_csv
 ORDER BY 3,4
 
---Select data that we are going to be using
+-- Select data that we are going to be using
 
 SELECT location, date, total_cases, new_cases, total_deaths, population
 FROM PortfolioProject..CovidDeaths_csv
@@ -26,27 +23,27 @@ WHERE location like '%states%'
 ORDER BY 1,2;
 
 
---Looking at Total Cases vs Population
---Shows what percentage of the population got Covid
+-- Looking at Total Cases vs Population
+-- Shows what percentage of the population got Covid
 SELECT location, date, population, total_cases, (total_cases/population)*100 AS PercentPopInfected
 FROM PortfolioProject..CovidDeaths_csv
---WHERE location like '%states%'
+-- WHERE location like '%states%'
 ORDER BY 1,2;
 
 
---Looking at countries with highest infection rate compared to population
+-- Looking at countries with highest infection rate compared to population
 SELECT location, population, MAX(total_cases) as HighestInfectionCount, MAX((total_cases/population))*100 AS PercentPopInfected
 FROM PortfolioProject..CovidDeaths_csv
---WHERE location like '%states%'
+-- WHERE location like '%states%'
 GROUP BY location, population
 ORDER BY PercentPopInfected desc;
 
 
---Showing countries with highest death count per population
+-- Showing countries with highest death count per population
 
 SELECT location, MAX(total_deaths) as TotalDeathCount
 FROM PortfolioProject..CovidDeaths_csv
---WHERE location like '%states%'
+-- WHERE location like '%states%'
 WHERE continent IS NOT null
 GROUP BY location
 ORDER BY TotalDeathCount desc;
@@ -54,12 +51,12 @@ ORDER BY TotalDeathCount desc;
 
 SELECT continent, MAX(total_deaths) as TotalDeathCount
 FROM PortfolioProject..CovidDeaths_csv
---WHERE location like '%states%'
+-- WHERE location like '%states%'
 WHERE continent IS NOT null
 GROUP BY continent
 ORDER BY TotalDeathCount desc;
 
--- ---GLOBAL NUMBERS
+-- GLOBAL NUMBERS
 
 SELECT date, SUM(new_cases) as total_cases, SUM (new_deaths) as total_deaths, SUM(new_deaths)/SUM(new_cases)*100 AS DeathPercentage
 FROM PortfolioProject..CovidDeaths_csv
@@ -79,7 +76,7 @@ JOIN PortfolioProject..CovidVaccinations_csv vac
 	WHERE dea.continent IS NOT NULL
 	ORDER BY 2,3
 
---USE CTE
+-- CTE
 WITH PopvsVac (continent, location, date, population, new_vaccinations, RollingPeopleVaccinated)
 AS
 (
@@ -97,7 +94,7 @@ JOIN PortfolioProject..CovidVaccinations_csv vac
 SELECT *, (RollingPeopleVaccinated/population)*100 as TotalPercentPeopleVacc
 FROM PopvsVac
 
---TEMP TABLE
+-- TEMP TABLE
 DROP table if exists #PercentPopulationVaccinated
 Create Table #PercentPopulationVaccinated
 (
@@ -123,7 +120,7 @@ JOIN PortfolioProject..CovidVaccinations_csv vac
 SELECT *, (RollingPeopleVaccinated/Population)*100 AS CurrentPercentPopulationVacc
 FROM #PercentPopulationVaccinated;
 
---Creating view to store data for later visualizations
+-- Creating view to store data for later visualizations
 
 CREATE VIEW PercentPopulationVaccinated as
 SELECT dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations, 
